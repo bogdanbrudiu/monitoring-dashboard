@@ -1,0 +1,32 @@
+ <div class="row">
+    <nav class= "navbar navbar-default" role= "navigation" ng-show="showactions">
+        <div class= "navbar-header" >
+            <a class="btn btn-lg btn-success" href="#/edit-entry/0"><i class="glyphicon glyphicon-plus"></i>&nbsp;Add new Entry</a>
+        </div>
+    </nav>
+    <div class="col-md-12" ng-show="entries.length > 0">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <th>Device Key&nbsp;</th>
+                <th>Timestamp&nbsp;</th>
+                <th>State&nbsp;</th>
+                <th ng-show="showActions">Action&nbsp;</th>
+                <th ng-show="showHistory">Action&nbsp;</th>
+            </thead>
+            <tbody>
+                <tr ng-repeat="data in entries">
+                    <td>{{data.deviceKey}}</td>
+                    <td>{{data.timestamp}}</td>
+                    <td>{{data.state}}</td>
+                    <td ng-show="showActions"><a href="#/edit-entry/{{data.id}}" class="btn">&nbsp;<i class="glyphicon glyphicon-edit"></i>&nbsp; Edit Entry</a></td>
+                    <td ng-show="showHistory"><a href="#/entry-history/{{data.deviceKey}}" class="btn">&nbsp;<i class="glyphicon glyphicon-edit"></i>&nbsp; View History</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-12" ng-show="entries.length == 0">
+        <div class="col-md-12">
+            <h4>No entries found</h4>
+        </div>
+    </div>
+</div>

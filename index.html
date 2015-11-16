@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html ng-app="myApp" ng-app lang="en">
+<head>
+    <meta charset="utf-8">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+    ul>li, a{cursor: pointer;}
+    </style>
+    <title>Monitoring Dashboard</title>
+</head>
+<body>
+<div class="navbar navbar-default" id="navbar">
+    <div class="container" id="navbar-container">
+    <div class="navbar-header">
+        <a href="https://monitoring-dashboard-bogdanbrudiu.c9users.io" class="navbar-brand">
+            <small>
+                <i class="glyphicon glyphicon-log-out"></i>
+                Monitoring Dashboard
+            </small>
+        </a><!-- /.brand -->
+        
+    </div><!-- /.navbar-header -->
+    <div class="navbar-header pull-right" role="navigation">
+       <a href="#/entries" class="btn btn-sm btn-danger nav-button-margin"> <i class="glyphicon glyphicon-book"></i>&nbsp;Manage Entries</a>
+    </div>
+    </div>
+</div>
+
+
+<div>
+<div class="container">
+<br/>
+    <div ng-view="" id="ng-view"></div>
+   
+</div>
+</div>
+<script src="js/angular.min.js"></script>
+<script src="js/angular-route.min.js"></script>
+<script src="app/app.js"></script>         
+</body>
+</html>

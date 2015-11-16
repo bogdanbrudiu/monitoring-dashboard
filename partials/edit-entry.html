@@ -1,0 +1,63 @@
+<style type="text/css">
+  .form-horizontal input.ng-invalid.ng-dirty {
+    border-color: #FA787E;
+  }
+
+  .form-horizontal input.ng-valid.ng-dirty {
+    border-color: #78FA89;
+  }
+</style>
+<div class="view">
+    <div class="container">
+        <div class="row">
+        <nav class= "navbar navbar-default" role= "navigation" >
+        <div class= "navbar-header" >
+        <a class= "navbar-brand" href= "#/entries"><i class="glyphicon glyphicon-th-large"></i> Entries List </a>
+        <a ng-show="entry._id" class= "navbar-brand" href= "#/edit-entry/0"><i class="glyphicon glyphicon-plus"></i> Create Entry </a>
+        <a ng-show="entry._id" class= "navbar-brand pull-right"><i class="glyphicon glyphicon-edit"></i> Currently Editing Entry Number: {{entry._id}}</a>
+        </div>
+        </nav>
+        <header>
+            <h3>{{title}}</h3>
+        </header>
+        <div class="col-md-12">
+
+<form role="form" name="myForm" class="form-horizontal">
+<div class="row">
+<div class= "form-group" ng-class="{error: myForm.deviceKey.$invalid}">
+    <label class= "col-md-2"> Name </label>
+    <div class="col-md-4">
+    <input name="deviceKey" ng-model="entry.deviceKey" type= "text" class= "form-control" placeholder="Device Key" required/>
+    <span ng-show="myForm.deviceKey.$dirty && myForm.deviceKey.$invalid" class="help-inline">Device Key Required</span>
+    </div>
+</div>
+<div class= "form-group">
+    <label class= "col-md-2">State </label>
+    <div class="col-md-4">
+    <input ng-model="entry.state" type= "text" class= "form-control" placeholder= "State"/>
+    </div>
+</div>
+<!--
+<div class= "form-group">
+    <label class= "col-md-2">Timestamp </label>
+    <div class="col-md-4">
+    <input ng-model="entry.timestamp" type= "text" class= "form-control" placeholder= "Timestamp"/>
+    </div>
+</div>
+-->
+<div class= "form-group">
+    <label class= "col-md-2"></label>
+    <div class="col-md-4">
+    <a href="#/entries" class="btn">Cancel</a>
+        <button ng-click="saveEntry(entry);" 
+                ng-disabled="isClean() || myForm.$invalid"
+                class="btn btn-primary">{{buttonText}}</button>
+        <button ng-click="deleteEntry(entry)"
+                ng-show="entry._id" class="btn btn-warning">Delete</button>
+    </div>
+</div>
+</div>
+</form>
+        </div></div>
+    </div>
+</div>

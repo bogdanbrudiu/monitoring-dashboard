@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS monitoring_dashboard;
+ 
+USE monitoring_dashboard;
+
+CREATE TABLE IF NOT EXISTS `entries` (
+`id` INT PRIMARY KEY AUTO_INCREMENT,
+`deviceKey` varchar(50) NOT NULL,
+`timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
+`state` varchar(50) DEFAULT NULL
+);
