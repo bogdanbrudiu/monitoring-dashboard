@@ -4,7 +4,7 @@
 #ifdef OTA
   #include <ESP8266httpUpdate.h>
 #endif
-String current_version = "0.1";
+String current_version = "v0.1";
 
 const char* ssid     = "UPC476387";
 const char* password = "YCHMOITV";
@@ -93,7 +93,7 @@ void loop() {
     }
     
     // We now create a URI for the request
-    String payload = "{'deviceKey':"+String(ESP.getChipId())+",'state':1}";
+    String payload = "{'deviceKey':"+String(ESP.getChipId())+",'state':1,'version':"+current_version+"}";
     
     Serial.print("POSTing payload:"+payload+" to URL: ");
     Serial.println(url);

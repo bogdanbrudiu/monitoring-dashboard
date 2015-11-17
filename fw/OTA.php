@@ -20,6 +20,7 @@ function sendFile($path) {
     readfile($path);
 }
 
+
 if(!check_header('HTTP_USER_AGENT', 'ESP8266-http-Update')) {
     header($_SERVER["SERVER_PROTOCOL"].' 403 Forbidden', true, 403);
     echo "only for ESP8266 updater!\n";
@@ -46,8 +47,36 @@ $db = array(
 );
 
 if(isset($db[$_SERVER['HTTP_X_ESP8266_STA_MAC']])) {
-    if($db[$_SERVER['HTTP_X_ESP8266_STA_MAC']] != $_SERVER['HTTP_X_ESP8266_VERSION']) ) {
+    if($db[$_SERVER['HTTP_X_ESP8266_STA_MAC']] != $_SERVER['HTTP_X_ESP8266_VERSION'] ) {
         sendFile("./bin/".$db[$_SERVER['HTTP_X_ESP8266_STA_MAC']]."bin");
+    } else {
+        header($_SERVER["SERVER_PROTOCOL"].' 304 Not Modified', true, 304);
+    }
+    exit();
+}else{
+    //if no setting then put the latest version 
+  
+    $cdir  = scandir("./bin/");
+    $bins = array(); 
+    
+    foreach ($cdir as $key => $value) 
+    { 
+        if (!in_array($value,array(".",".."))) 
+        { 
+            if (!is_dir($dir . DIRECTORY_SEPARATOR . $value)) 
+            { 
+                array_push($bins,$value);
+                if($latestVersion=="" || $latestVersion<substr(substr($value, 0, strlen($value)-4), strripos($value,".v")+2)) {
+                    $latestVersion=substr(substr($value, 0, strlen($value)-4), strripos($value,".v")+2);
+                    $latestVersionFile=substr($value, 0, strripos($value,".v")+2);
+                }
+            } 
+        } 
+    } 
+
+
+    if($latestVersion != $_SERVER['HTTP_X_ESP8266_VERSION'] ) {
+        sendFile("./bin/".$latestVersionFile.$latestVersion.".bin");
     } else {
         header($_SERVER["SERVER_PROTOCOL"].' 304 Not Modified', true, 304);
     }
