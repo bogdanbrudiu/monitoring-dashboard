@@ -1,38 +1,49 @@
 var app = angular.module('myApp', ['ngRoute']);
 app.factory("services", ['$http', function($http) {
-  var serviceBase = 'services/'
+  var serviceBase = 'services/';
     var obj = {};
     obj.getEntries = function(){
         return $http.get(serviceBase + 'entries');
-    }
+    };
     obj.getAllEntries = function(){
         return $http.get(serviceBase + 'allentries');
-    }
+    };
     obj.getEntriesByDeviceKey = function(deviceKey){
         return $http.get(serviceBase + 'allentries?deviceKey=' + deviceKey);
-    }
+    };
     obj.getEntry = function(entryID){
         return $http.get(serviceBase + 'entry?id=' + entryID);
-    }
-
+    };
     obj.insertEntry = function (entry) {
-    return $http.post(serviceBase + 'insertEntry', entry).then(function (results) {
+      return $http.post(serviceBase + 'insertEntry', entry).then(function (results) {
         return results;
-    });
-	};
-
-	obj.updateEntry = function (entryID,entry) {
-	    return $http.post(serviceBase + 'updateEntry', {id:entryID, entry:entry}).then(function (status) {
-	        return status.data;
+      });
+	  };
+	  obj.updateEntry = function (entryID,entry) {
+      return $http.post(serviceBase + 'updateEntry', {id:entryID, entry:entry}).then(function (status) {
+	      return status.data;
 	    });
-	};
-
-	obj.deleteEntry = function (entryID) {
+	  };
+  	obj.deleteEntry = function (entryID) {
 	    return $http.delete(serviceBase + 'deleteEntry?id=' + entryID).then(function (status) {
 	        return status.data;
 	    });
-	};
+	  };
 
+
+    obj.getDevices = function(){
+        return $http.get(serviceBase + 'devices');
+    };
+    obj.insertDevice = function (entry) {
+      return $http.post(serviceBase + 'insertOrUpdateDevice', entry).then(function (results) {
+        return results;
+      });
+	  };
+  	obj.deleteDevice = function (entryID) {
+	    return $http.delete(serviceBase + 'deleteDevice?deviceKey=' + entryID).then(function (status) {
+	        return status.data;
+	    });
+	  };
     return obj;   
 }]);
 
@@ -61,12 +72,12 @@ app.controller('editCtrl', function ($scope, $rootScope, $location, $routeParams
 
       $scope.isClean = function() {
         return angular.equals(original, $scope.entry);
-      }
+      };
 
       $scope.deleteEntry = function(entry) {
         $location.path('/entries');
         if(confirm("Are you sure to delete entry number: "+$scope.entry._id)==true)
-        services.deleteEntry(entry.id);
+          services.deleteEntry(entry.id);
       };
 
       $scope.saveEntry = function(entry) {
@@ -77,13 +88,45 @@ app.controller('editCtrl', function ($scope, $rootScope, $location, $routeParams
         else {
             services.updateEntry(entryID, entry);
         }
-    };
+      };
 });
 app.controller('historyCtrl', function ($scope, $routeParams, services) {
   services.getEntriesByDeviceKey($routeParams.deviceKey).then(function(data){
         $scope.entries = data.data;
     });
 });
+
+app.controller('devicesCtrl', function ($scope, $location, services) {
+   $scope.editedItems = {};
+   $scope.oldValues = {};
+    services.getDevices().then(function(data){
+        $scope.entries = data.data;
+    });
+    $scope.toggleEditing = function(device) {
+      $scope.editedItems[device.deviceKey] =  !$scope.editedItems[device.deviceKey] || true;
+      $scope.oldValues[device.deviceKey] =  $scope.oldValues[device.deviceKey]?$scope.oldValues[device.deviceKey]:device.friendlyName;
+    };
+    $scope.cancelEditing= function(device, $event) {
+      device.friendlyName=$scope.oldValues[device.deviceKey];
+      delete $scope.editedItems[device.deviceKey];
+      delete $scope.oldValues[device.deviceKey]; 
+      $event.stopPropagation();
+    };
+    $scope.saveDevice = function(device, $event) {
+        $location.path('/devices');
+        services.insertDevice(device);
+        delete $scope.editedItems[device.deviceKey];
+        delete $scope.oldValues[device.deviceKey]; 
+        $event.stopPropagation();
+    };
+    $scope.deleteDevice = function(entry) {
+        $location.path('/devices');
+        if(confirm("Are you sure to delete device: "+entry.deviceKey)==true)
+          services.deleteDevice(entry.deviceKey);
+    };
+});
+
+
 app.config(['$routeProvider',
   function($routeProvider) {
     $routeProvider.
@@ -112,6 +155,11 @@ app.config(['$routeProvider',
         title: 'Entry History',
         templateUrl: 'partials/entry-history.html',
         controller: 'historyCtrl'
+      })
+      .when('/devices', {
+        title: 'Devices',
+        templateUrl: 'partials/devices.html',
+        controller: 'devicesCtrl'
       })
       .otherwise({
         redirectTo: '/'

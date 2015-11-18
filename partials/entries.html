@@ -10,6 +10,8 @@
                 <th>Device Key&nbsp;</th>
                 <th>Timestamp&nbsp;</th>
                 <th>State&nbsp;</th>
+                <th>Battery&nbsp;</th>
+                <th>RSSI&nbsp;</th>
                 <th ng-show="showActions">Action&nbsp;</th>
                 <th ng-show="showHistory">Action&nbsp;</th>
             </thead>
@@ -18,6 +20,8 @@
                     <td>{{data.deviceKey}}</td>
                     <td>{{data.timestamp}}</td>
                     <td>{{data.state}}</td>
+                    <td>{{data.battery}}</td>
+                    <td>{{data.rssi}}</td>
                     <td ng-show="showActions"><a href="#/edit-entry/{{data.id}}" class="btn">&nbsp;<i class="glyphicon glyphicon-edit"></i>&nbsp; Edit Entry</a></td>
                     <td ng-show="showHistory"><a href="#/entry-history/{{data.deviceKey}}" class="btn">&nbsp;<i class="glyphicon glyphicon-edit"></i>&nbsp; View History</a></td>
                 </tr>

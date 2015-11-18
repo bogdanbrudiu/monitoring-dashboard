@@ -65,7 +65,7 @@
 			if($this->get_request_method() != "GET"){
 				$this->response('',406);
 			}
-			$query="SELECT * FROM (SELECT d.id, d.deviceKey, d.state, d.timestamp FROM entries d order by d.timestamp desc) t group by t.deviceKey order by t.deviceKey";
+			$query="SELECT t.*, d.friendlyName FROM (SELECT * FROM entries d order by d.timestamp desc) t LEFT OUTER JOIN devices d on t.deviceKey=d.deviceKey group by t.deviceKey order by t.deviceKey";
 			$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
 
 			if($r->num_rows > 0){
@@ -83,7 +83,7 @@
 			}
 			$id = (int)$this->_request['id'];
 			if($id > 0){	
-				$query="SELECT distinct d.deviceKey, d.state, d.timestamp FROM entries d where d.id=$id";
+				$query="SELECT distinct * FROM entries d where d.id=$id";
 				$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
 				if($r->num_rows > 0) {
 					$result = $r->fetch_assoc();	
@@ -99,7 +99,7 @@
 			}
 
 			$entry = json_decode(file_get_contents("php://input"),true);
-			$column_names = array('deviceKey', 'state');
+			$column_names = array('deviceKey', 'state', 'version', 'battery', 'rssi');
 			$keys = array_keys($entry);
 			$columns = '';
 			$values = '';
@@ -126,7 +126,7 @@
 			}
 			$entry = json_decode(file_get_contents("php://input"),true);
 			$id = (int)$entry['id'];
-			$column_names = array('deviceKey', 'state');
+			$column_names = array('deviceKey', 'state', 'version', 'battery', 'rssi');
 			$keys = array_keys($entry['entry']);
 			$columns = '';
 			$values = '';
@@ -160,6 +160,76 @@
 			}else
 				$this->response('',204);	// If no records "No Content" status
 		}
+		
+		
+		
+		
+		
+		private function devices(){	
+			if($this->get_request_method() != "GET"){
+				$this->response('',406);
+			}
+			$query="select * FROM ((SELECT * FROM devices) UNION (SELECT deviceKey,'' as friendlyName FROM entries e GROUP BY e.deviceKey)) as t group by t.deviceKey order by t.deviceKey";
+			$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
+
+			if($r->num_rows > 0){
+				$result = array();
+				while($row = $r->fetch_assoc()){
+					$result[] = $row;
+				}
+				$this->response($this->json($result), 200); // send user details
+			}
+			$this->response('',204);	// If no records "No Content" status
+		}
+		
+		private function deleteDevice(){
+			if($this->get_request_method() != "DELETE"){
+				$this->response('',406);
+			}
+			$deviceKey = $this->_request['deviceKey'];
+			if($id > 0){				
+				$query="DELETE FROM entries WHERE deviceKey = $deviceKey";
+				$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
+				$query="DELETE FROM devices WHERE deviceKey = $deviceKey";
+				$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
+				$success = array('status' => "Success", "msg" => "Successfully deleted device.");
+				$this->response($this->json($success),200);
+			}else
+				$this->response('',204);	// If no records "No Content" status
+		}
+		private function insertOrUpdateDevice(){
+			if($this->get_request_method() != "POST"){
+				$this->response('',406);
+			}
+
+			$entry = json_decode(file_get_contents("php://input"),true);
+			$column_names = array('deviceKey', 'friendlyName');
+			$update_column_names = array('friendlyName');
+			$keys = array_keys($entry);
+			$columns = '';
+			$values = '';
+			$update = '';
+			foreach($column_names as $desired_key){ // Check the record received. If blank insert blank into the array.
+			   	if(!in_array($desired_key, $keys)) {
+			   		$$desired_key = '';
+				}else{
+					$$desired_key = $entry[$desired_key];
+				}
+				$columns = $columns.$desired_key.',';
+				$values = $values."'".$$desired_key."',";
+				if(in_array($desired_key, $update_column_names)){
+					$update = $update.$desired_key."='".$$desired_key."',";
+				}
+			}
+			$query = "INSERT INTO devices(".trim($columns,',').") VALUES(".trim($values,',').") ON DUPLICATE KEY UPDATE ".trim($update,',');
+			if(!empty($entry)){
+				$r = $this->mysqli->query($query) or die($query." ".$this->mysqli->error.__LINE__);
+				$success = array('status' => "Success", "msg" => "Record Created Successfully.", "data" => $entry);
+				$this->response($this->json($success),200);
+			}else
+				$this->response('',204);	//"No Content" status
+		}
+	
 		
 		/*
 		 *	Encode array into JSON
