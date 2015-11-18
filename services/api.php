@@ -1,5 +1,5 @@
 <?php
-
+ini_set('display_errors','On'); ini_set('error_reporting','E_ALL | E_STRICT'); error_reporting(E_ALL);
  	require_once("Rest.inc.php");
 
 	class API extends REST {
@@ -15,14 +15,14 @@
 		private $mysqli = NULL;
 		public function __construct(){
 			parent::__construct();				// Init parent contructor
-			/*
+			
 			if($OPENSHIFT_MYSQL_DB_HOST!=null){
 					$this->DB_SERVER = $OPENSHIFT_MYSQL_DB_HOST;
 					$this->DB_USER = "adminexMR6vD";
 					$this->SB_PASSWORD = "iRy1WzxnuTv1";
 					$this->DB_NAME = "monitoringdashboard";
 					$this->DB_PORT = $OPENSHIFT_MYSQL_DB_PORT;
-			}*/
+			}
 
 			$this->dbConnect();					// Initiate Database connection
 		}
