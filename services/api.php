@@ -1,21 +1,29 @@
 <?php
+
  	require_once("Rest.inc.php");
-	
+
 	class API extends REST {
 	
-		public $data = "";
-		
-		const DB_SERVER = "127.0.0.1";
-		const DB_USER = "bogdanbrudiu";
-		const SB_PASSWORD = "";
-		const DB_NAME = "monitoring_dashboard";
-		const DB_PORT = 3306;
 
+		private $DB_SERVER = "127.0.0.1";
+		private $DB_USER = "bogdanbrudiu";
+		private $SB_PASSWORD = "";
+		private $DB_NAME = "monitoring_dashboard";
+		private $DB_PORT = 3306;
 
 
 		private $mysqli = NULL;
 		public function __construct(){
 			parent::__construct();				// Init parent contructor
+			/*
+			if($OPENSHIFT_MYSQL_DB_HOST!=null){
+					$this->DB_SERVER = $OPENSHIFT_MYSQL_DB_HOST;
+					$this->DB_USER = "adminexMR6vD";
+					$this->SB_PASSWORD = "iRy1WzxnuTv1";
+					$this->DB_NAME = "monitoringdashboard";
+					$this->DB_PORT = $OPENSHIFT_MYSQL_DB_PORT;
+			}*/
+
 			$this->dbConnect();					// Initiate Database connection
 		}
 		
@@ -23,7 +31,8 @@
 		 *  Connect to Database
 		*/
 		private function dbConnect(){
-			$this->mysqli = new mysqli(self::DB_SERVER, self::DB_USER, self::SB_PASSWORD, self::DB_NAME, self::DB_PORT);
+			$this->mysqli = new mysqli($this->DB_SERVER, $this->DB_USER, $this->DB_PASSWORD, $this->DB_NAME, $this->DB_PORT);
+
 		}
 		
 		/*

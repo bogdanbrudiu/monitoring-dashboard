@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `entries` (
 `state` varchar(50) DEFAULT NULL,
 `version` varchar(50) DEFAULT NULL,
 `battery` varchar(50) DEFAULT NULL,
-`rssi` varchar(50) DEFAULT NULL,
+`rssi` varchar(50) DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS `devices` (
