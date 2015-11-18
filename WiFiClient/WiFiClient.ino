@@ -1,10 +1,10 @@
-//#define OTA
-
+#include <Ticker.h>
 #include <ESP8266WiFi.h>
-#ifdef OTA
-  #include <ESP8266httpUpdate.h>
-#endif
-String current_version = "v0.1";
+#include <ESP8266httpUpdate.h>
+
+ADC_MODE(ADC_VCC);
+#define OTA
+String current_version = "0.1";
 
 const char* ssid     = "UPC476387";
 const char* password = "YCHMOITV";
@@ -14,27 +14,56 @@ String url = "/services/insertEntry";
 const int httpPort = 80;
 
 
-const int refreshInterval = 30000; //5 sec
+const int refreshInterval = 30000; //30 sec
 
 #ifdef OTA
+  Ticker OTAUpdateTicker;
   const int OTArefreshInterval = 1000*60*60*24; //once a day 
   String OTAhost = "monitoring-dashboard-bogdanbrudiu.c9users.io";
   const int OTAPort = 80;
   String OTAurl = "/fw/OTA.php";
 #endif
 
+Ticker blinker;
 
 
 void setup() {
   Serial.begin(115200);
   delay(10);
 
+ 
+#ifdef OTA  
+  OTAUpdateTicker.attach(OTArefreshInterval, OTAUpdate);
+#endif  
   // We start by connecting to a WiFi network
   WiFiConnect();
- 
+  
+  pinMode(BUILTIN_LED, OUTPUT);
+  digitalWrite(BUILTIN_LED, LOW);
 }
+#ifdef OTA  
+void OTAUpdate(){
+  digitalWrite(BUILTIN_LED, HIGH);
+   Serial.print("check for OTA update... ");
+      t_httpUpdate_return ret = ESPhttpUpdate.update(OTAhost,OTAPort, OTAurl,current_version);
+      switch(ret) {
+          case HTTP_UPDATE_FAILD:
+             Serial.println("[update] Update failed.");
+              break;
+          case HTTP_UPDATE_NO_UPDATES:
+              Serial.println("[update] Update no Update.");
+              break;
+          case HTTP_UPDATE_OK:
+              Serial.println("[update] Update ok."); // may not called we reboot the ESP
+              break;
+      }
+  digitalWrite(BUILTIN_LED, LOW);
+}
+#endif  
 
 void WiFiConnect(){
+  // blink every 0.3s
+  blinker.attach(0.3, blink);
   Serial.println();
   Serial.println();
   Serial.print("Connecting to ");
@@ -51,36 +80,23 @@ void WiFiConnect(){
   Serial.println("WiFi connected");  
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+  blinker.detach();
 }
 
-int passes=0;
+void blink()
+{
+  int state = digitalRead(BUILTIN_LED);  
+  digitalWrite(BUILTIN_LED, !state);     
+}  
+
 void loop() {
-  passes++;
+
   if(WiFi.status() != WL_CONNECTED) {
        Serial.print("WiFi connection lost... ");
        WiFiConnect();
   } 
   else{
-#ifdef OTA
-    if(passes>OTArefreshInterval/refreshInterval){
-      passes=0;
-      
-      Serial.print("check for OTA update... ");
-      t_httpUpdate_return ret = ESPhttpUpdate.update(OTAhost,OTAPort, OTAurl,current_version);
-      switch(ret) {
-          case HTTP_UPDATE_FAILD:
-             Serial.println("[update] Update failed.");
-              break;
-          case HTTP_UPDATE_NO_UPDATES:
-              Serial.println("[update] Update no Update.");
-              break;
-          case HTTP_UPDATE_OK:
-              Serial.println("[update] Update ok."); // may not called we reboot the ESP
-              break;
-      }
-    }
-#endif
-    
+
     Serial.print("connecting to ");
     Serial.println(host);
     
@@ -93,7 +109,7 @@ void loop() {
     }
     
     // We now create a URI for the request
-    String payload = "{'deviceKey':"+String(ESP.getChipId())+",'state':1,'version':"+current_version+"}";
+    String payload = "{'deviceKey':"+String(ESP.getChipId())+",'state':1,'version':"+current_version+",'battery':"+String(analogRead(A0))+",'RSSI':"+String(WiFi.RSSI())+"}";
     
     Serial.print("POSTing payload:"+payload+" to URL: ");
     Serial.println(url);
