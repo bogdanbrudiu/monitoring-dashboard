@@ -148,7 +148,7 @@ ini_set('display_errors','On'); ini_set('error_reporting','E_ALL | E_STRICT'); e
 				$columns = $columns.$desired_key."='".$$desired_key."',";
 			}
 			$query = "UPDATE entries SET ".trim($columns,',')." WHERE id=$id";
-			if(!empty(entry)){
+			if(!empty($entry)){
 				$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
 				$success = array('status' => "Success", "msg" => "Record ".$id." Updated Successfully.", "data" => $entry);
 				$this->response($this->json($success),200);
