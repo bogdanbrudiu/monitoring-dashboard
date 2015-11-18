@@ -32,7 +32,6 @@
 		*/
 		private function dbConnect(){
 			$this->mysqli = new mysqli($this->DB_SERVER, $this->DB_USER, $this->DB_PASSWORD, $this->DB_NAME, $this->DB_PORT);
-
 		}
 		
 		/*
@@ -71,12 +70,13 @@
 			$this->response('',204);	// If no records "No Content" status
 		}
 		private function entries(){	
+
 			if($this->get_request_method() != "GET"){
 				$this->response('',406);
 			}
+
 			$query="SELECT t.*, d.friendlyName FROM (SELECT * FROM entries d order by d.timestamp desc) t LEFT OUTER JOIN devices d on t.deviceKey=d.deviceKey group by t.deviceKey order by t.deviceKey";
 			$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
-
 			if($r->num_rows > 0){
 				$result = array();
 				while($row = $r->fetch_assoc()){
