@@ -34,9 +34,9 @@
 		private function dbConnect(){
 			$this->mysqli = new mysqli($this->DB_SERVER, $this->DB_USER, $this->DB_PASSWORD, $this->DB_NAME, $this->DB_PORT);
 
-			if ($mysqli->connect_error) {
-			    die('Connect Error (' . $mysqli->connect_errno . ') '
-			            . $mysqli->connect_error);
+			if ($this->mysqli->connect_error) {
+			    die('Connect Error (' . $this->mysqli->connect_errno . ') '
+			            . $this->mysqli->connect_error);
 			}
 
 		}
