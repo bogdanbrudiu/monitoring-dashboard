@@ -1,5 +1,6 @@
 <?php
-ini_set('display_errors','On'); ini_set('error_reporting','E_ALL | E_STRICT'); error_reporting(E_ALL);
+	ini_set('display_errors','On'); ini_set('error_reporting','E_ALL | E_STRICT'); error_reporting(E_ALL);
+ 	
  	require_once("Rest.inc.php");
 
 	class API extends REST {
@@ -16,13 +17,13 @@ ini_set('display_errors','On'); ini_set('error_reporting','E_ALL | E_STRICT'); e
 		public function __construct(){
 			parent::__construct();				// Init parent contructor
 			
-			if(isset($OPENSHIFT_MYSQL_DB_HOST)){
-					$this->DB_SERVER = $OPENSHIFT_MYSQL_DB_HOST;
-					$this->DB_USER = "adminexMR6vD";
-					$this->DB_PASSWORD = "iRy1WzxnuTv1";
-					$this->DB_NAME = "monitoringdashboard";
-					$this->DB_PORT = $OPENSHIFT_MYSQL_DB_PORT;
-			}
+            if(getenv('OPENSHIFT_MYSQL_DB_HOST')!=null){
+                            $this->DB_SERVER = getenv('OPENSHIFT_MYSQL_DB_HOST');
+                            $this->DB_USER = getenv('OPENSHIFT_MYSQL_DB_USERNAME');
+                            $this->DB_PASSWORD = getenv('OPENSHIFT_MYSQL_DB_PASSWORD');
+                            $this->DB_NAME = "monitoringdashboard";
+                            $this->DB_PORT = getenv('OPENSHIFT_MYSQL_DB_PORT');
+            }
 
 			$this->dbConnect();					// Initiate Database connection
 		}
@@ -32,6 +33,12 @@ ini_set('display_errors','On'); ini_set('error_reporting','E_ALL | E_STRICT'); e
 		*/
 		private function dbConnect(){
 			$this->mysqli = new mysqli($this->DB_SERVER, $this->DB_USER, $this->DB_PASSWORD, $this->DB_NAME, $this->DB_PORT);
+
+			if ($mysqli->connect_error) {
+			    die('Connect Error (' . $mysqli->connect_errno . ') '
+			            . $mysqli->connect_error);
+			}
+
 		}
 		
 		/*
