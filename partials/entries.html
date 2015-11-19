@@ -1,5 +1,5 @@
  <div class="row">
-    <nav class= "navbar navbar-default" role= "navigation" ng-show="showactions">
+    <nav class= "navbar navbar-default" role= "navigation" ng-show="showActions">
         <div class= "navbar-header" >
             <a class="btn btn-lg btn-success" href="#/edit-entry/0"><i class="glyphicon glyphicon-plus"></i>&nbsp;Add new Entry</a>
         </div>
@@ -7,6 +7,7 @@
     <div class="col-md-12" ng-show="entries.length > 0">
         <table class="table table-striped table-bordered">
             <thead>
+                <th>Friendly Name&nbsp;</th>
                 <th>Device Key&nbsp;</th>
                 <th>Timestamp&nbsp;</th>
                 <th>State&nbsp;</th>
@@ -17,6 +18,7 @@
             </thead>
             <tbody>
                 <tr ng-repeat="data in entries">
+                    <td>{{data.friendlyName?data.friendlyName:data.deviceKey}}</td>
                     <td>{{data.deviceKey}}</td>
                     <td>{{data.timestamp}}</td>
                     <td>{{data.state}}</td>

@@ -1,5 +1,6 @@
 <?php
-
+	//ini_set('display_errors','On'); ini_set('error_reporting','E_ALL | E_STRICT'); error_reporting(E_ALL);
+ 	
  	require_once("Rest.inc.php");
 
 	class API extends REST {
@@ -7,7 +8,7 @@
 
 		private $DB_SERVER = "127.0.0.1";
 		private $DB_USER = "bogdanbrudiu";
-		private $SB_PASSWORD = "";
+		private $DB_PASSWORD = "";
 		private $DB_NAME = "monitoring_dashboard";
 		private $DB_PORT = 3306;
 
@@ -15,14 +16,14 @@
 		private $mysqli = NULL;
 		public function __construct(){
 			parent::__construct();				// Init parent contructor
-			/*
-			if($OPENSHIFT_MYSQL_DB_HOST!=null){
-					$this->DB_SERVER = $OPENSHIFT_MYSQL_DB_HOST;
-					$this->DB_USER = "adminexMR6vD";
-					$this->SB_PASSWORD = "iRy1WzxnuTv1";
-					$this->DB_NAME = "monitoringdashboard";
-					$this->DB_PORT = $OPENSHIFT_MYSQL_DB_PORT;
-			}*/
+			
+            if(getenv('OPENSHIFT_MYSQL_DB_HOST')!=null){
+                            $this->DB_SERVER = getenv('OPENSHIFT_MYSQL_DB_HOST');
+                            $this->DB_USER = getenv('OPENSHIFT_MYSQL_DB_USERNAME');
+                            $this->DB_PASSWORD = getenv('OPENSHIFT_MYSQL_DB_PASSWORD');
+                            $this->DB_NAME = "monitoringdashboard";
+                            $this->DB_PORT = getenv('OPENSHIFT_MYSQL_DB_PORT');
+            }
 
 			$this->dbConnect();					// Initiate Database connection
 		}
@@ -32,6 +33,11 @@
 		*/
 		private function dbConnect(){
 			$this->mysqli = new mysqli($this->DB_SERVER, $this->DB_USER, $this->DB_PASSWORD, $this->DB_NAME, $this->DB_PORT);
+
+			if ($this->mysqli->connect_error) {
+			    die('Connect Error (' . $this->mysqli->connect_errno . ') '
+			            . $this->mysqli->connect_error);
+			}
 
 		}
 		
@@ -71,12 +77,13 @@
 			$this->response('',204);	// If no records "No Content" status
 		}
 		private function entries(){	
+
 			if($this->get_request_method() != "GET"){
 				$this->response('',406);
 			}
+
 			$query="SELECT t.*, d.friendlyName FROM (SELECT * FROM entries d order by d.timestamp desc) t LEFT OUTER JOIN devices d on t.deviceKey=d.deviceKey group by t.deviceKey order by t.deviceKey";
 			$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
-
 			if($r->num_rows > 0){
 				$result = array();
 				while($row = $r->fetch_assoc()){
@@ -148,7 +155,7 @@
 				$columns = $columns.$desired_key."='".$$desired_key."',";
 			}
 			$query = "UPDATE entries SET ".trim($columns,',')." WHERE id=$id";
-			if(!empty(entry)){
+			if(!empty($entry)){
 				$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
 				$success = array('status' => "Success", "msg" => "Record ".$id." Updated Successfully.", "data" => $entry);
 				$this->response($this->json($success),200);
