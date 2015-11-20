@@ -98,7 +98,7 @@ app.controller('historyCtrl', function ($scope, $routeParams, services) {
     });
 });
 
-app.controller('devicesCtrl', function ($scope, $location, services) {
+app.controller('devicesCtrl', function ($scope, $location, $route, services) {
    $scope.editedItems = {};
    $scope.oldValues = {};
     services.getDevices().then(function(data){
@@ -123,8 +123,10 @@ app.controller('devicesCtrl', function ($scope, $location, services) {
     };
     $scope.deleteDevice = function(entry) {
         $location.path('/devices');
-        if(confirm("Are you sure to delete device: "+entry.deviceKey)==true)
+        if(confirm("Are you sure to delete device: "+entry.deviceKey)==true){
           services.deleteDevice(entry.deviceKey);
+           $route.reload();
+        }
     };
 });
 

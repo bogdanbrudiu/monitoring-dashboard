@@ -203,10 +203,10 @@
 				$this->response('',406);
 			}
 			$deviceKey = $this->_request['deviceKey'];
-			if($id > 0){				
-				$query="DELETE FROM entries WHERE deviceKey = $deviceKey";
+			if(isset($deviceKey)){				
+				$query="DELETE FROM entries WHERE deviceKey = '$deviceKey'";
 				$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
-				$query="DELETE FROM devices WHERE deviceKey = $deviceKey";
+				$query="DELETE FROM devices WHERE deviceKey = '$deviceKey'";
 				$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
 				$success = array('status' => "Success", "msg" => "Successfully deleted device.");
 				$this->response($this->json($success),200);

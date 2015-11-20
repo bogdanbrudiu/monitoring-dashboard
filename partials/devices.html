@@ -7,10 +7,10 @@
                 <th>Action&nbsp;</th>
             </thead>
             <tbody>
-                <tr ng-repeat="data in entries" ng-click="toggleEditing(data)">
+                <tr ng-repeat="data in entries" >
                     <td>{{data.deviceKey}}</td>
-                    <td ng-hide="editedItems[data.deviceKey]">{{data.friendlyName}}</td>
-                    <td ng-show="editedItems[data.deviceKey]"><input ng-model="data.friendlyName" type= "text" class= "form-control" placeholder= "Friendly Name"/><button type="button" ng-click="saveDevice(data, $event)" class="btn btn-primary">Save</button> <a ng-click="cancelEditing(data, $event)"  class="btn">Cancel</a></td>
+                    <td ng-hide="editedItems[data.deviceKey]" ng-click="toggleEditing(data)">{{data.friendlyName}}</td>
+                    <td ng-show="editedItems[data.deviceKey]" ng-click="toggleEditing(data)"><input ng-model="data.friendlyName" type= "text" class= "form-control" placeholder= "Friendly Name"/><button type="button" ng-click="saveDevice(data, $event)" class="btn btn-primary">Save</button> <a ng-click="cancelEditing(data, $event)"  class="btn">Cancel</a></td>
                     <td><button ng-click="deleteDevice(data)"  class="btn btn-warning">Delete</button></td>
                 </tr>
             </tbody>
