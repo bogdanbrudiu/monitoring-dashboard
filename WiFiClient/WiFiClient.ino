@@ -1,25 +1,31 @@
+/*
+blink every 0.5s while WiFi connection
+blink every 0.3s while sending payload
+solid led while OTA
+
+*/
+
 #include <Ticker.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266httpUpdate.h>
 
-ADC_MODE(ADC_VCC);
-#define OTA
+ADC_MODE(ADC_VCC); //analogread gets VCC voltage
+#define OTA  //comment to disable OTA update
 String current_version = "0.1";
-
+const int refreshInterval = 30000; //30 sec
 const char* ssid     = "UPC476387";
 const char* password = "YCHMOITV";
 
-String host = "monitoring-dashboard-bogdanbrudiu.c9users.io";
+//String host = "monitoring-dashboard-bogdanbrudiu.c9users.io";
+String host = "monitoringdashboard-bogdanbrudiu.rhcloud.com";
 String url = "/services/insertEntry";
 const int httpPort = 80;
 
 
-const int refreshInterval = 30000; //30 sec
-
 #ifdef OTA
   Ticker OTAUpdateTicker;
   const int OTArefreshInterval = 1000*60*60*24; //once a day 
-  String OTAhost = "monitoring-dashboard-bogdanbrudiu.c9users.io";
+  String OTAhost = host;
   const int OTAPort = 80;
   String OTAurl = "/fw/OTA.php";
 #endif
@@ -62,8 +68,8 @@ void OTAUpdate(){
 #endif  
 
 void WiFiConnect(){
-  // blink every 0.3s
-  blinker.attach(0.3, blink);
+  // blink every 0.5s
+  blinker.attach(0.5, blink);
   Serial.println();
   Serial.println();
   Serial.print("Connecting to ");
@@ -96,7 +102,8 @@ void loop() {
        WiFiConnect();
   } 
   else{
-
+ // blink every 0.5s
+  blinker.attach(0.5, blink);
     Serial.print("connecting to ");
     Serial.println(host);
     
@@ -121,8 +128,8 @@ void loop() {
     Serial.println("Host: " + host);
     client.println("Connection: close");
     Serial.println("Connection: close");
-    client.println("Cookie: c9.live.user.sso=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NDE1NDk4LCJuYW1lIjoiYm9nZGFuYnJ1ZGl1IiwiaWF0IjoxNDQ3Njk3MzQ1LCJleHAiOjE0NDc3ODM3NDV9.fkN8ri2uZryKbnJyzjDAaZcmWLDhdxqAkQ4dfUFb9IU");
-    Serial.println("Cookie: c9.live.user.sso=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NDE1NDk4LCJuYW1lIjoiYm9nZGFuYnJ1ZGl1IiwiaWF0IjoxNDQ3Njk3MzQ1LCJleHAiOjE0NDc3ODM3NDV9.fkN8ri2uZryKbnJyzjDAaZcmWLDhdxqAkQ4dfUFb9IU");
+    //client.println("Cookie: c9.live.user.sso=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NDE1NDk4LCJuYW1lIjoiYm9nZGFuYnJ1ZGl1IiwiaWF0IjoxNDQ3Njk3MzQ1LCJleHAiOjE0NDc3ODM3NDV9.fkN8ri2uZryKbnJyzjDAaZcmWLDhdxqAkQ4dfUFb9IU");
+    //Serial.println("Cookie: c9.live.user.sso=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NDE1NDk4LCJuYW1lIjoiYm9nZGFuYnJ1ZGl1IiwiaWF0IjoxNDQ3Njk3MzQ1LCJleHAiOjE0NDc3ODM3NDV9.fkN8ri2uZryKbnJyzjDAaZcmWLDhdxqAkQ4dfUFb9IU");
     
 
 
@@ -146,6 +153,7 @@ void loop() {
     
     Serial.println();
     Serial.println("closing connection");
+    blinker.detach();
     delay(refreshInterval);
   }
 }
